@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -13,6 +15,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String email = '';
   String password = '';
   final formkey = GlobalKey<FormState>();
+
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  static Future<User?> registerEmailPassword(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user;
+    try {
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      user = userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+    CircularProgressIndicator();
+    return user;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   margin: EdgeInsets.all(25),
                   child: Column(
                     children: <Widget>[
-                      usernameFormField(),
-                      SizedBox(
-                        height: 20,
-                      ),
                       emailFormField(),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      phoneNumberFormField(),
                       SizedBox(
                         height: 20,
                       ),
@@ -100,7 +120,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      agreementCheckBox(),
                     ],
                   ),
                 )
@@ -136,6 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget emailFormField() {
     return TextFormField(
+      controller: _emailController,
       decoration: InputDecoration(
           fillColor: Colors.grey.withOpacity(0.1),
           filled: true,
@@ -147,12 +167,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hintText: "Email ID",
           prefixIcon: Icon(Icons.alternate_email)),
       keyboardType: TextInputType.emailAddress,
-      validator: (String? value) {
-        if (!validateEmail(value!)) {
-          return "Please use valid email address";
-        }
-        return null;
-      },
+      // validator: (String? value) {
+      //   if (!validateEmail(value!)) {
+      //     return "Please use valid email address";
+      //   }
+      //   return null;
+      // },
     );
   }
 
@@ -183,6 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget passwordFormField() {
     return TextFormField(
+      controller: _passwordController,
       obscureText: true,
       decoration: InputDecoration(
         fillColor: Colors.grey.withOpacity(0.1),
@@ -195,12 +216,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         hintText: "Enter Password",
         prefixIcon: Icon(Icons.lock_outline),
       ),
-      validator: (value) {
-        if (!validatePassword(value!)) {
-          return "Password must be minimum eight characters, at least one uppercase letter, one lowercase letter and one number";
-        }
-        return null;
-      },
+      // validator: (value) {
+      //   if (!validatePassword(value!)) {
+      //     return "Password must be minimum eight characters, at least one uppercase letter, one lowercase letter and one number";
+      //   }
+      //   return null;
+      // },
       keyboardType: TextInputType.visiblePassword,
     );
   }
@@ -212,8 +233,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           )),
-      onPressed: () {
-        formkey.currentState!.validate();
+      onPressed: () async {
+        // formkey.currentState!.validate();
+        User? user = await registerEmailPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+            context: context);
+        print(user?.uid);
+        if (user != null) {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => LoginScreen()));
+        }
       },
       child: Text(
         "Register",

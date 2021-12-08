@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/profile.dart';
+import 'package:flutter_application_1/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print("No user found for that email");
       }
     }
+    CircularProgressIndicator();
     return user;
   }
 
@@ -112,6 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 40,
                       ),
                       submitBtton(),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      registerBtton(),
                     ],
                   ),
                 )
@@ -235,6 +241,27 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Text(
         "Login",
+        style: TextStyle(
+          fontSize: 19,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton registerBtton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          padding: new EdgeInsets.symmetric(vertical: 20.0, horizontal: 125.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          )),
+      onPressed: () {
+        // formkey.currentState!.validate();
+       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => RegisterScreen()));
+      },
+      child: Text(
+        "Register",
         style: TextStyle(
           fontSize: 19,
           fontWeight: FontWeight.w600,
