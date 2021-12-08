@@ -16,15 +16,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String password = '';
   final formkey = GlobalKey<FormState>();
 
-  static Future<User?> signOut({required String email, required String password, required BuildContext context}) async {
+  void _signOut() {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-    await auth.signOut();
-    user = null;
-    if(user == null){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => LoginScreen()));
-    }
-    return user;
+    auth.signOut().then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return LoginScreen();
+      }));
+    });
   }
 
   TextEditingController _emailController = TextEditingController();
@@ -145,10 +143,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           )),
-      onPressed: () async {
+      onPressed: () {
         // formkey.currentState!.validate();
-        FirebaseAuth auth = FirebaseAuth.instance;
-        await auth.signOut();
+        _signOut();
       },
       child: Text(
         "Logout",
