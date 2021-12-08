@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -14,6 +15,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String email = '';
   String password = '';
   final formkey = GlobalKey<FormState>();
+
+  static Future<User?> signOut({required String email, required String password, required BuildContext context}) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user;
+    await auth.signOut();
+    user = null;
+    if(user == null){
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => LoginScreen()));
+    }
+    return user;
+  }
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -103,17 +115,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-Widget emailFormField() {
+  Widget emailFormField() {
     return TextField(
       decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(0.1),
-          filled: true,
-          contentPadding:
-              new EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(40)),
-              borderSide: BorderSide.none),
-          hintText: "my email here",
+        fillColor: Colors.grey.withOpacity(0.1),
+        filled: true,
+        contentPadding:
+            new EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(40)),
+            borderSide: BorderSide.none),
+        hintText: "my email here",
       ),
       keyboardType: TextInputType.emailAddress,
       controller: _emailController,
@@ -133,8 +145,10 @@ Widget emailFormField() {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           )),
-      onPressed: () async{
+      onPressed: () async {
         // formkey.currentState!.validate();
+        FirebaseAuth auth = FirebaseAuth.instance;
+        await auth.signOut();
       },
       child: Text(
         "Logout",
